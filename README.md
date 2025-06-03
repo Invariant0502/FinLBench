@@ -86,6 +86,183 @@ FinLongEval 评测集对于以下三类群体或组织有一定帮助：
 
 </details>
 
+## 评估示例
+
+<div align="center">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/figure9.png" width="600px" height="300px" alt="评估流程示意图">
+</div>
+
+我们在上图中展示了整个评估流程示例。首先，将问题和原始文本输入到待评估的 LLM，从而得到模型的输出。在评估过程中，对于商业模型，我们直接将完整的 PDF 文件提交给 LLM；而对于本地部署的开源模型，无法直接提交 PDF，只能先将 PDF 提取成纯文本，再输入模型。随后，将生成的内容、问题和评估提示一起输入用于评分的 LLM，得到模型输出的分数和理由。最后，将所有获取的内容与原始文本进行对比，并对分数做微调，得出最终评分。
+
+在获取该示例的初始评分后，我们发现若干不一致之处，因而做出以下调整：首先，评分模型给出的相关性分数超出了 0 到 1 的范围，我们将其上限设为 1 分。其次，连贯度得分的理由为“未能解释所产生的经济效益和影响”，与我们的连贯度标准不符，因此我们将连贯度修正为 2 分。最后，忠实度反映模型输出与原文的契合度，最初的评分并未对照原文进行判定。对比生成答案与原文后，我们发现原文确实包含相似内容，因此将忠实度调整为 1 分。
+
+## 六维度评估体系
+
+- **相关性（1 分）：** 生成答案与问题之间的关联程度。确保相关性意味着模型能给出直接与金融问题相关的回答，对准确决策至关重要。  
+  **专家意见：** 相关性是评估的基础维度，因此该维度采用二元评判：内容首先必须高度贴合主题，才能对其他维度进行考察。
+
+- **流畅性（2 分）：** 判断生成答案是否通顺、主旨清晰、语法合理。流畅性保证输出内容清晰易懂。  
+  **专家意见：** 流畅性直接影响阅读体验和理解度。在金融领域，尽管语言表达重要，但准确性和实用性更为关键，因此流畅性赋予适中权重，以平衡语言表达与信息质量。
+
+- **连贯度（2 分）：** 考察答案文本逻辑结构是否合理、段落组织是否恰当。连贯度对复杂金融分析和报告的逻辑性与条理性至关重要。  
+  **专家意见：** 连贯度保证内容逻辑清晰，但在金融领域，其重要性略逊于实用性和一致性，因为后者对决策质量影响更大。
+
+- **有用性（5 分）：** 判断生成答案是否满足用户需求并提供必要信息（是否有明确结论、是否提供详实数据支持）。有用性衡量模型是否能为金融决策提供有价值的见解和数据。  
+  **专家意见：** 有用性直接体现内容的实用价值，是评估的核心目标，因此赋予最高权重。
+
+- **一致性（4 分）：** 判断答案文本是否正确回答问题。通过一致性确保生成的数据和结论前后不矛盾，避免给出相互冲突的金融观点。  
+  **专家意见：** 在金融领域，高度一致性是建立信任的关键要素，因此为该维度给予显著权重。
+
+- **忠实度（1 分）：** 判断生成答案是否忠实于原文本。忠实度保证输出准确反映原始金融数据，维护可靠性。  
+  **专家意见：** 忠实度是保证内容准确性的基础要求，在金融领域不可忽视。
+
+## 提示语设置
+
+### 系统提示语
+
+以下为简化版系统提示，用于指导模型根据六维度标准生成并评分。完整提示请参见附带文档。
+
+相关性：问题与答案之间的关联程度。  
+评分：0 分 – 无关；1 分 – 与问题相关。
+
+流畅性：答案文本的清晰度和语法。  
+评分：0 分 – 表达不清或存在错误；1 分 – 可理解但存在问题；2 分 – 清晰且语法正确。
+
+连贯度：答案文本的逻辑结构和一致性。  
+评分：0 分 – 逻辑混乱或不一致；1 分 – 与常识相符；2 分 – 逻辑性强、结构合理。
+
+有用性：细节、清晰度及与问题契合度。  
+评分：0–5 分，依据详细标准，包括数据、逻辑流程和覆盖所有方面。
+
+一致性：答案文本与参考答案的契合度。  
+评分：0–4 分，依据一致性与准确程度。
+
+忠实度：答案是否忠实于参考答案。  
+评分：1 分 – 忠实；0 分 – 包含额外或无关信息。
+
+### 通用任务评估提示
+
+通用任务提示用于指导系统根据参考答案对生成答案进行评分，需结合系统提示使用。
+
+任务描述：请根据给定的问题、参考答案和待评估答案，按照相关性、流畅性、连贯度、有用性、一致性、忠实度 6 个维度打分。先给出整数分数，再附上理由。
+
+问题：  
+{question}
+
+参考答案：  
+{reference_answer}
+
+待评估答案：  
+{generated_answer}
+
+示例输出格式：  
+相关性：X 分  
+理由：————————
+
+流畅性：X 分  
+理由：————————  
+…
+
+### 陷阱问题评估提示
+
+以下提示用于判断模型生成的答案中是否包含虚构内容，用于评估生成内容的可信度。
+
+任务描述：根据给定的问题、参考答案和生成答案，判断生成答案是否包含虚构内容，并说明理由。
+
+问题：  
+{question}
+
+参考答案：  
+{reference_answer}
+
+生成答案：  
+{generated_answer}
+
+输出格式：  
+有无虚构：有/无  
+理由：————————
+
+### 数据计算评估提示
+
+该提示用于验证生成答案的计算是否准确，计算结果必须与参考答案完全一致。
+
+任务描述：根据给定的数据计算问题、参考答案和生成答案，评估生成答案的计算是否正确，计算结果必须与参考答案完全一致方可视为正确。
+
+问题：  
+{question}
+
+参考答案：  
+{reference_answer}
+
+生成答案：  
+{generated_answer}
+
+输出格式：  
+正确/错误  
+理由：————————
+
+## 数据集构建方法
+
+### 金融长文档数据集构建
+
+本数据集的所有金融长文档均来自中国最大证券交易所——上海证券交易所的信息披露文件。在确定 FinLBench 中包含的八类文档时，我们既参考了行业内的具体需求，也兼顾了数据集的广泛适用性，旨在构建能反映金融分析和决策过程中多样文档类型的综合数据集。具体选取理由如下：
+
+- **研  报：** 包括个股研报、行业研报、宏观研报和量化研报，是投资研究的基础材料。选入原因在于投资决策对深度分析的需求，文本长度通常在 10,000 到 30,000 字之间。
+- **公司重大事项：** 主要涵盖股权激励公告等文件，有助于理解公司治理与员工激励机制。通过分析股权激励公告，投资者和分析师可洞察公司留才策略及长期增长潜力，文本长度约 300,000 到 500,000 字。
+- **财经资讯：** 包括主流财经媒体评论和早报，能及时获取市场动态与新闻。文本长度较短，约 3,000 到 10,000 字，适合快速分析和决策。
+- **会议路演：** 包含业绩电话会议和策略会等，提供公司策略与市场定位的深度见解。文本长度通常在 10,000 到 50,000 字之间，反映会议讨论的详细程度。
+- **政策文件：** 涵盖国务院政策文件、政府工作报告和央行货币政策报告等，是理解监管与经济环境的关键。文本长度在 10,000 到 50,000 字之间。
+- **学  术论文：** 涵盖货币政策、外汇储备、疫情研究等金融学术专题，提供对金融问题的理论洞见。文本长度在 10,000 到 30,000 字之间，适合集合深入学术分析。
+- **定期报告：** 包括财务摘要、行业报告、宏观报告和量化报告等，支撑投资研究所需的定量分析，文本长度在 10,000 到 30,000 字之间。
+- **公司发行：** 包括招股说明书、债券募集书、基金募集说明书、年报、业绩快报等文件，有助于了解公司行动与财务状况。大部分文本在 100,000 到 300,000 字之间，反映其综合性与详尽度。
+
+选择这些文档类型旨在兼顾行业需求与广泛适用性，使 FinLBench 成为金融专业人士和研究者的多场景评估工具。通过覆盖多样文档类型，增强数据集在各金融场景中的实用性和关联度。
+
+### 专家驱动的问题设计
+
+我们采用专家驱动的方法构建 FinLBench 的问题，以确保问题与实际金融场景对齐，并满足真实分析需求。该方法利用领域专家设计精准、贴合且具有代表性的测试问题。每种问题类型的评估目标和业务场景描述见表 \[tab:financial_tasks\]。
+
+#### 设计原则
+
+在设计基准时，我们确保评估数据集源于一线金融业务场景，并能服务于多种应用场景。为此，我们遵循以下原则：
+
+- **场景对齐：** 问题应反映金融分析师日常工作中面临的真实挑战与询问。
+- **领域专家：** 每个问题均由金融领域专家精心设计，确保准确性、上下文相关性和分析深度。
+- **覆盖与关联：** 问题结构涵盖多种金融场景，代表行业中典型需求与多样问题类型。
+
+#### 协作开发过程
+
+我们与多家领先券商的业务和 IT 部门的金融专家紧密合作，共同开发问题，确保所构建的问题贴合真实金融实践与挑战。该过程保证问题既具备理论合理性，又具备实际可操作性，为评估金融长文档分析能力奠定坚实基础。
+
+<div align="center">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/figure14.png" width="800px" height="250px" alt="评估流程示意图">
+</div>
+
+### 使用 LLM 构建问题
+
+我们还采用了使用 LLM 构建 FinLBench 问题的方法。通过将提示语作为模板，使用非被测模型的 LLM 来生成问题，我们发现 LLM 不仅能根据文档和问题生成答案，还能高质量地构建符合要求的问题。提示模板如图 \[fig:template1\] 所示。其中，“金融场景”部分描述问题产生的背景，告知 LLM 分析师在文档中关注的内容或重点；“问题类型”部分简要说明问题的类别与特点。
+
+为了保证 LLM 生成问题的高质量，我们邀请金融专家对 LLM 生成的问题进行审核筛选，挑选出在实际场景中具有价值的问题纳入数据集。
+
+<div align="center">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/figure12.png" width="600px" height="300px" alt="评估流程示意图">
+</div>
+
+我们展示了一个使用 LLM 构建事件分析问题的示例，如图 \[fig:examplequescon\] 所示。LLM 提出的第一个问题在给定场景下具有价值并被采纳，而第二个问题因在该场景下相关性和实用性较低而被拒绝。
+
+<div align="center">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/figure13.png" width="600px" height="300px" alt="评估流程示意图">
+</div>
+
+### 参考答案的混合流程
+
+在构建 FinLBench 参考答案时，我们采用“2+1+1”混合流程（见图 \[fig:workflow\]），以确保答案质量。对于有明确答案的封闭式问题，直接从原文中抽取相关内容作为参考答案。对于占 80% 且涉及长篇金融文档的开放式问题，我们采用人机结合的方法以兼顾效率与质量。
+
+具体而言，首先使用两款最先进的 LLM（ChatGPT 4 和 Claude 2）分别生成初始答案；接着，由一名专家对 AI 生成的两个答案进行审核，将二者优点整合成连贯且完整的答案；最后，另一名专家对整合后答案进行复核与优化，确保其准确性、清晰性与对照原文一致。最终得到的答案即为评估数据集的参考答案。
+
+之所以采用此流程，是因为大多数问题具有主观性且文档篇幅较大，直接人工编写耗时巨大；而经过适当人力监督，先进 AI 模型能够生成接近人类水平的答案。人机协作既提升效率，又保证了 FinLBench 数据集所需的高标准。
+
+
 ## 金融长文档处理能力的评估办法 ##
 ### 评估维度 ###
 为了对于大模型生成的答案进行细颗粒度的评价，参考通行的方案，我们选择了 6 个评估维度来对各个大模型所生成的答案进行评估，分别是**相关性**、**有用性**、**流畅性**、**连贯性**、**一致性**和**忠实度**，各维度的详细介绍如下：
@@ -305,6 +482,183 @@ Below is a preview of our dataset structure—showing primary and secondary docu
 | Research Report | Equity Research Report         | The Electric Vehicle King Competes Globally, Building Core Competitiveness Through Vertical Integration | Trap Question         | BYD’s main business is fuel vehicles. Describe BYD’s fuel vehicle business status.                                                                                                                                                                                                         | “As of March 2022, BYD had begun to discontinue sales of fuel vehicles and shifted its focus entirely to the development and sale of new energy vehicles. Therefore, there is no further detailed information on BYD’s fuel vehicle business in the report, as the company has fully transitioned to new energy vehicles.”                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 
 </details>
+
+## An Evaluation Instance
+
+<div align="center">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/figure9.png" width="600px" height="300px" alt="Evaluation Process Illustration">
+</div>
+
+We present an example that includes the entire evaluation process, as shown in the figure above. Initially, we input the question and the original text into the LLMs that are to be evaluated, yielding the model's output. During the evaluation process, for commercial models, we submitted the entire PDF files directly to the LLMs. However, for locally deployed open-source models, we are unable to submit the PDF files directly. Instead, we extract the plain text from the PDFs and input that into the model. Subsequently, we input the generated content, the question, and the assessment prompts into the LLMs used for evaluation, which provides a set of generated scores and reasons. Finally, we integrate all the obtained content with the original text, perform a comparison, and make minor adjustments to the scores to arrive at the final score.
+
+Upon receiving the initial score for this particular instance, we made adjustments due to several discrepancies. The relevance score, as provided by the scoring model, surpassed the designated range of 0 to 1 point, leading us to cap the relevance score at 1 point. The coherence score was justified with the comment, “it fails to explain the economic benefits and impact generated,” which did not correspond to our criteria for coherence. As a result, we revised the coherence score to 2 points. Fidelity, which reflects the model's adherence to the original text of the document, was initially scored without reference to the original text. After comparing the generated answer with the original text, we found that the original did indeed contain similar content. Consequently, we adjusted the fidelity score to 1 point.
+
+## Six-dimensional Evaluation System
+
+- **Relevance (1 point):** The relationship between the generated answer text and the question. Ensuring relevance guarantees that the model provides answers directly related to the financial question, crucial for accurate decision-making.  
+  **Expert opinion:** Relevance is the fundamental criterion for evaluation, thus a binary evaluation metric is established for this dimension. The content must first be highly pertinent to the subject before other dimensions can be assessed.
+
+- **Fluency (2 points):** Whether the generated answer text is fluent, with a clear main idea and reasonable grammar. Fluency ensures that the generated financial text is clear and grammatically correct, facilitating ease of understanding.  
+  **Expert opinion:** Fluency directly impacts the reader's experience and comprehension. While fluency is important, in the financial domain, the accuracy and utility of the content are more critical. Therefore, fluency is assigned a moderate weight to balance linguistic expression with the quality of information.
+
+- **Coherence (2 points):** Evaluate whether the answer text itself is in line with common sense and logical, and whether the text paragraphs are organized reasonably. Coherence is vital for maintaining logical and organized reasoning in complex financial analyses and reports.  
+  **Expert opinion:** Coherence ensures clarity in the logic and structure of content. While important, in the financial domain, its significance is still lower than that of practicality and consistency, as the latter more directly impact decision-making quality.
+
+- **Helpfulness (5 points):** Whether the generated answer text meets the user’s request and provides necessary information (with a focus on whether there are clear conclusions and whether detailed data support is provided). Helpfulness assesses whether the model offers valuable insights and detailed data that aid in financial decision-making.  
+  **Expert opinion:** Usefulness directly reflects the practical value and applicability of the content. As this is the core objective of the evaluation, it is assigned the highest weight.
+
+- **Consistency (4 points):** Whether the answer text correctly answers the question. Consistency ensures that all generated data and conclusions align logically, preventing conflicting financial insights.  
+  **Expert opinion:** Consistency is a critical factor in ensuring the credibility of content. Information in the financial sector demands high levels of accuracy and consistency, thus it is given significant weight in evaluations.
+
+- **Fidelity (1 point):** Whether the generated answer text is faithful to the original text. Fidelity ensures the model’s output accurately reflects the original financial data, preserving accuracy and reliability.  
+  **Expert opinion:** Fidelity is a fundamental requirement for ensuring the accuracy of content. In the financial sector, while the importance of fidelity cannot be overlooked.
+
+## Prompt Settings
+
+### System Prompt
+
+This section presents a simplified version of the system prompt, which is used to guide the model in generating responses and scoring them based on six evaluation criteria. The complete version of the system prompt can be found in the attached document.
+
+Relevance: The relationship between the question and the answer.  
+Scoring: 0 points – irrelevant; 1 point – related to the question.
+
+Fluency: The clarity and grammar of the answer text.  
+Scoring: 0 points – unclear or has errors; 1 point – understandable but has issues; 2 points – clear and grammatically correct.
+
+Coherence: The logical structure and consistency of the answer text.  
+Scoring: 0 points – illogical or inconsistent; 1 point – consistent with common sense; 2 points – logical and well-organized.
+
+Helpfulness: The detail, clarity, and alignment with the question.  
+Scoring: 0–5 points based on detailed criteria, including data, logical flow, and coverage of all aspects.
+
+Consistency: The alignment of the answer text with the reference answer.  
+Scoring: 0–4 points based on the level of consistency and accuracy.
+
+Fidelity: Whether the answer is faithful to the reference answer.  
+Scoring: 1 point – faithful; 0 points – includes extra or irrelevant information.
+
+### General Tasks Evaluation Prompt
+
+The general tasks prompt is used to guide the system in evaluating the generated model responses based on the reference answer. It includes how to compare the generated answer with the reference answer and provide specific scores and reasons. **Only the general tasks prompt needs to be combined with the system prompt for proper evaluation.**
+
+Task Description: Based on the given question, reference answer, and the answer to be evaluated, score the evaluated answer according to 6 criteria: relevance, fluency, coherence, usefulness, consistency, and fidelity. Give an integer score first, followed by an explanation.
+
+Question:  
+{question}
+
+Reference Answer:  
+{reference_answer}
+
+Answer to be Evaluated:  
+{generated_answer}
+
+Output Format Example:  
+Relevance: X points  
+Reason: [Explanation]
+
+Fluency: X points  
+Reason: [Explanation]  
+...
+
+### Trap Issues Evaluation Prompt
+
+This section presents the prompt used to evaluate whether the generated model answer contains fabricated content. It helps identify any potential fabrication in the model's generated answer. **This prompt is used to assess the trustworthiness of generated content.**
+
+Task description: Based on the given question, reference answer, and generated model answer, determine whether the generated answer contains fabrication and provide reasons.
+
+Question:  
+{question}
+
+Reference Answer:  
+{reference_answer}
+
+Generated Model Answer:  
+{generated_answer}
+
+Output format:  
+Fabricated/Not Fabricated  
+Reason: [Explanation]
+
+### Data Calculation Evaluation Prompt
+
+This section presents the prompt used to evaluate whether the generated model's answer is accurate in terms of data calculation, ensuring that the calculation result is completely consistent with the reference answer. **It focuses on verifying the correctness of calculations in the model's responses.**
+
+Task description: Based on the given data calculation problem, reference answer, and generated model answer, evaluate whether the generated answer is calculated correctly. The final calculation result must be exactly consistent to be considered correct.
+
+Question:  
+{question}
+
+Reference Answer:  
+{reference_answer}
+
+Generated Answer:  
+{generated_answer}
+
+Output format:  
+Correct/Incorrect  
+Reason: [Explanation]
+
+## Methodology for Dataset Construction
+
+### Financial Long Document Dataset Construction
+
+All financial long documents in this dataset are sourced from the information disclosure files of the largest stock exchange in China, the Shanghai Stock Exchange. In determining the eight document types included in FinLBench, the selection process was guided by both specific industry needs and broader applicability. The aim was to create a comprehensive dataset that reflects the diverse range of documents encountered in financial analysis and decision-making processes. Here's a breakdown of the rationale behind the selection:
+
+- **Research Report:** These documents, including individual stock reports, industry reports, macroeconomic reports, and quantitative analysis reports, are fundamental to investment research. Their inclusion is based on the specific need for detailed analysis in investment decisions, with text lengths ranging from 10,000 to 30,000 words.
+- **Company Major Matters:** Primarily including equity incentive announcements, these documents are crucial for understanding corporate governance and employee incentive mechanisms. By analyzing equity incentive announcements, investors and analysts can gain insights into how a company motivates and retains key talent, which is essential for assessing the company's long-term strategy and potential growth. The document length is approximately between 300,000 and 500,000 words.
+- **Financial News:** Covering financial commentary and morning reports from mainstream financial media, these documents are essential for staying updated with market trends and news. Their shorter length, between 3,000 and 10,000 words, makes them suitable for quick analysis and decision-making.
+- **Conference Roadshow:** Including earnings calls and strategy meetings, these documents provide insights into company strategies and market positioning. Their text length, ranging from 10,000 to 50,000 words, reflects the detailed discussions typical of such events.
+- **Policy Document:** Encompassing State Council policy documents, government work reports, and central bank monetary policy reports, these documents are vital for understanding regulatory and economic environments. Their inclusion is based on the need for policy analysis, with text lengths between 10,000 and 50,000 words.
+- **Academic Paper:** Covering topics like monetary policy, foreign exchange reserves, and pandemic research, these documents provide in-depth theoretical insights into financial issues. Their text length, ranging from 10,000 to 30,000 words, supports detailed academic analysis.
+- **Periodic Report:** These documents, including individual stock reports, industry reports, macroeconomic reports, and quantitative analysis reports, are fundamental to investment research. Their inclusion is based on the specific need for detailed analysis in investment decisions, with text lengths ranging from 10,000 to 30,000 words.
+- **Company Issuance:** This category includes IPO prospectuses, bond prospectuses, fund prospectuses, annual reports, earnings forecasts & bulletins. These documents are crucial for understanding corporate actions and financial health, with most texts ranging from 100,000 to 300,000 words, reflecting their comprehensive nature.
+
+The selection of these document types ensures that FinLBench addresses both specific industry requirements and broader analytical needs, making it a versatile tool for financial professionals and researchers. By covering a wide range of document types, FinLBench is designed to be applicable across various financial scenarios, enhancing its utility and relevance in the field.
+
+### Expert-Driven Question Construction
+
+We adopted expert-driven methods for question construction in FinLBench to ensure that the dataset aligns with practical financial scenarios and addresses real-world analytical needs. This approach leverages domain expertise to create questions that are precise, relevant, and representative of key challenges in financial analysis. Specifically, the assessment objectives and business scenario descriptions for each question type are shown in Table \[tab:financial_tasks\].
+
+#### Construction Principles
+
+In designing the benchmark, we aimed to ensure that the evaluation dataset originates from frontline financial business scenarios and serves as a robust tool across various use cases. To achieve this, we adhered to the following principles:
+
+- **Scenario Alignment:** Questions are crafted to reflect real challenges and inquiries faced by financial analysts in their day-to-day work.
+- **Domain Expertise:** Each question is meticulously designed by financial experts, ensuring accuracy, contextual relevance, and analytical depth.
+- **Breadth and Relevance:** The questions are structured to address a wide range of financial scenarios, representing typical needs and diverse problem types within the industry.
+
+#### Collaborative Development Process
+
+We developed the questions through close collaboration with financial experts from leading securities firms. By engaging with professionals from both business and IT departments, we ensured that the constructed questions resonate with real-world financial practices and challenges. This process ensures that the questions are not only theoretically sound but also practically applicable, forming a strong foundation for evaluating performance in financial long-document analysis.
+
+<div align="center">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/figure14.png" width="800px" height="250px" alt="Evaluation Process Illustration">
+</div>
+
+### Constructing Questions Using LLMs
+
+We have also implemented the method of constructing questions in FinLBench using LLMs. By using the prompt as a template to generate questions using an LLM other than the tested model, we found that LLMs not only have the ability to generate answers based on documents and questions, but also have good performance in constructing questions that meet the requirements. The prompt template is shown in Figure \[fig:template1\]. The financial scenario is a description that informs the LLM of the scenarios in which these questions are raised, including the content or focus that the analyst wants to understand in the document. The question type refers to the type and brief introduction of questions that the LLM is designed for.
+
+To ensure the high quality of the questions posed by the LLM and their inclusion in the dataset, we have had financial experts review and filter the questions raised by the LLM, thereby identifying those that are truly valuable.
+
+<div align="center">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/figure12.png" width="600px" height="300px" alt="Evaluation Process Illustration">
+</div>
+
+We have demonstrated an example of constructing event analysis questions using an LLM, as illustrated in Figure \[fig:examplequescon\]. The first question given by the LLM is valuable in the given scenario and is adopted, while the second question is rejected due to its low relevance and usefulness in the given scenario.
+
+<div align="center">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/figure13.png" width="600px" height="300px" alt="Evaluation Process Illustration">
+</div>
+
+### Hybrid Workflow for Constructing Reference Answers
+
+In constructing the reference answers for the FinLBench evaluation dataset, we employed a "2+1+1" workflow (illustrated in Figure \[fig:workflow\]) to ensure high-quality and reliable answers. For closed-ended questions, where clear answers exist within the document, we directly used the relevant content from the original text as the reference answer. For open-ended questions, which constitute 80% of the dataset and often involve financial documents spanning tens of thousands of words, we adopted a hybrid human-AI approach to balance efficiency and quality.
+
+Specifically, we began by leveraging two state-of-the-art LLMs, ChatGPT 4 and Claude 2, to independently generate two initial answers based on the question and the original financial document. Next, a human expert reviewed these AI-generated answers, validating them against the document content and integrating the best aspects of both into a cohesive and comprehensive response. Finally, a second human expert conducted a thorough review and optimization of the integrated answer, ensuring accuracy, clarity, and alignment with the original document. This finalized answer was used as the reference answer for the evaluation dataset.
+
+The adoption of this workflow stems from the challenges inherent in creating a predominantly subjective question set with significant document length. While direct human authorship would be prohibitively time-consuming, we observed that advanced AI models, with appropriate human oversight, are capable of producing answers that approach human-level quality. This human-AI collaboration not only ensures efficiency but also maintains the high standard required for the FinLBench dataset.
+
 
 ## An Evaluation Instance
 
