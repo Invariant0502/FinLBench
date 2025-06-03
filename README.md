@@ -730,19 +730,19 @@ Key takeaways:
 ### Analysis by Document Type
 
 <div align="center">
-  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/plot01.png" width="650px" height="220px" alt="Score by Question Type">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/plot01.png" width="650px" height="270px" alt="Score by Question Type">
 </div>
 <div align="center">
-  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/plot02.png" width="650px" height="220px" alt="Score by Question Type">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/plot02.png" width="650px" height="270px" alt="Score by Question Type">
 </div>
 <div align="center">
-  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/plot03.png" width="650px" height="220px" alt="Score by Question Type">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/plot03.png" width="650px" height="270px" alt="Score by Question Type">
 </div>
 <div align="center">
-  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/plot04.png" width="650px" height="220px" alt="Score by Question Type">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/plot04.png" width="650px" height="270px" alt="Score by Question Type">
 </div>
 <div align="center">
-  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/plot05.png" width="650px" height="220px" alt="Score by Question Type">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/plot05.png" width="650px" height="270px" alt="Score by Question Type">
 </div>
 
 * For **major corporate actions** and **policy documents**, all tools perform comparably well, meeting business-usable standards, since these tasks focus on extraction and comprehension.
@@ -751,16 +751,16 @@ Key takeaways:
 ### Analysis by Question Type
 
 <div align="center">
-  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/plot1.png width="650px" height="220px" alt="Score by Question Type">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/plot1.png" width="650px" height="270px" alt="Score by Question Type">
 </div>
 <div align="center">
-  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/plot2.png" width="650px" height="220px" alt="Score by Question Type">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/plot2.png" width="650px" height="270px" alt="Score by Question Type">
 </div>
 <div align="center">
-  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/plot3.png" width="650px" height="220px" alt="Score by Question Type">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/plot3.png" width="650px" height="270px" alt="Score by Question Type">
 </div>
 <div align="center">
-  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/plot4.png" width="650px" height="220px" alt="Score by Question Type">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/plot4.png" width="650px" height="270px" alt="Score by Question Type">
 </div>
 
 * **Logical reasoning** and **event analysis** show the greatest tool gaps, driven by differences in core reasoning capabilities.
