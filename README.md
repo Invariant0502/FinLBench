@@ -220,7 +220,7 @@ FinLongEval 评测集对于以下三类群体或组织有一定帮助：
 
 ### 专家驱动的问题设计
 
-我们采用专家驱动的方法构建 FinLBench 的问题，以确保问题与实际金融场景对齐，并满足真实分析需求。该方法利用领域专家设计精准、贴合且具有代表性的测试问题。每种问题类型的评估目标和业务场景描述见表 \[tab:financial_tasks\]。
+我们采用专家驱动的方法构建 FinLBench 的问题，以确保问题与实际金融场景对齐，并满足真实分析需求。该方法利用领域专家设计精准、贴合且具有代表性的测试问题。
 
 #### 设计原则
 
@@ -248,7 +248,7 @@ FinLongEval 评测集对于以下三类群体或组织有一定帮助：
   <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/figure12.png" width="600px" height="300px" alt="评估流程示意图">
 </div>
 
-我们展示了一个使用 LLM 构建事件分析问题的示例，如图 \[fig:examplequescon\] 所示。LLM 提出的第一个问题在给定场景下具有价值并被采纳，而第二个问题因在该场景下相关性和实用性较低而被拒绝。
+我们展示了一个使用 LLM 构建事件分析问题的示例，如图所示。LLM 提出的第一个问题在给定场景下具有价值并被采纳，而第二个问题因在该场景下相关性和实用性较低而被拒绝。
 
 <div align="center">
   <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/figure13.png" width="600px" height="300px" alt="评估流程示意图">
@@ -256,7 +256,7 @@ FinLongEval 评测集对于以下三类群体或组织有一定帮助：
 
 ### 参考答案的混合流程
 
-在构建 FinLBench 参考答案时，我们采用“2+1+1”混合流程（见图 \[fig:workflow\]），以确保答案质量。对于有明确答案的封闭式问题，直接从原文中抽取相关内容作为参考答案。对于占 80% 且涉及长篇金融文档的开放式问题，我们采用人机结合的方法以兼顾效率与质量。
+在构建 FinLBench 参考答案时，我们采用“2+1+1”混合流程，以确保答案质量。对于有明确答案的封闭式问题，直接从原文中抽取相关内容作为参考答案。对于占 80% 且涉及长篇金融文档的开放式问题，我们采用人机结合的方法以兼顾效率与质量。
 
 具体而言，首先使用两款最先进的 LLM（ChatGPT 4 和 Claude 2）分别生成初始答案；接着，由一名专家对 AI 生成的两个答案进行审核，将二者优点整合成连贯且完整的答案；最后，另一名专家对整合后答案进行复核与优化，确保其准确性、清晰性与对照原文一致。最终得到的答案即为评估数据集的参考答案。
 
@@ -276,17 +276,6 @@ FinLongEval 评测集对于以下三类群体或组织有一定帮助：
 | 一致性（Consistency） | 将大模型所生成的答案与参考答案进行比较，判断大模型的回答文本与参考答案的一致性（包括关键数据一般要完全一致） | 0-4分 |
 | 忠实度（Faithfulness） | 评估大模型所生成的答案是否忠实于原文，用来评估可能存在的幻觉情况 | 0-1分 |
 
-### 评估流程 ###
-在本评测集中，除了少量的关键词、陷阱问题类任务，大部分问题是开放式问题，因此整体评分采用人机配合，并由人类专家完成最终打分。
-
-对于封闭式问题，可以使用诸如 ROUGE（Recall-Oriented Understudy for Gisting Evaluation）之类的自动评估方法，因为这些问题通常具有明确且确定的答案。ROUGE 是一种基于 n-gram 重叠的评估方法，通过计算生成的回答与参考答案之间的共享词汇和短语来评估回答的质量。这种方法在封闭式问题上表现良好，因为它可以直接比较生成的回答与正确答案之间的相似度。
-
-然而，对于开放式问题，答案可能具有多样性、主观性以及高层次的语义性，这使得自动评估方法（如 ROUGE）难以准确评估生成回答的质量。在这种情况下，人类评估是更可靠的方法，因为人类专家可以自己的专业背景，根据问题的背景和上下文，以及答案的相关性、准确性和充分性来对生成的回答进行综合评价。同时，人类评估能够捕捉到自动评估方法可能忽略的细节和细微差别，从而更好地反映回答的质量。
-
-结合本评测集的实际情况，对于每个问题，我们先用 GPT-4 结合参考答案从6个维度对于大模型生成的回答进行分别打分，然后每一个答案由多名人类专家参考机器打分独立进行打分，最终再汇总得到最终分数。
-<div align="center">
-  <img src="https://github.com/valuesimplex/FinLongEval/blob/main/fig/%E8%AF%84%E4%BC%B0%E6%B5%81%E7%A8%8B%E7%A4%BA%E6%84%8F%E5%9B%BE.png" width="600px" height="300px">
-</div>
 
 ## 评测结果 ##
 ### 评估对象 ###
@@ -617,7 +606,7 @@ The selection of these document types ensures that FinLBench addresses both spec
 
 ### Expert-Driven Question Construction
 
-We adopted expert-driven methods for question construction in FinLBench to ensure that the dataset aligns with practical financial scenarios and addresses real-world analytical needs. This approach leverages domain expertise to create questions that are precise, relevant, and representative of key challenges in financial analysis. Specifically, the assessment objectives and business scenario descriptions for each question type are shown in Table \[tab:financial_tasks\].
+We adopted expert-driven methods for question construction in FinLBench to ensure that the dataset aligns with practical financial scenarios and addresses real-world analytical needs. This approach leverages domain expertise to create questions that are precise, relevant, and representative of key challenges in financial analysis.
 
 #### Construction Principles
 
@@ -653,7 +642,7 @@ We have demonstrated an example of constructing event analysis questions using a
 
 ### Hybrid Workflow for Constructing Reference Answers
 
-In constructing the reference answers for the FinLBench evaluation dataset, we employed a "2+1+1" workflow (illustrated in Figure \[fig:workflow\]) to ensure high-quality and reliable answers. For closed-ended questions, where clear answers exist within the document, we directly used the relevant content from the original text as the reference answer. For open-ended questions, which constitute 80% of the dataset and often involve financial documents spanning tens of thousands of words, we adopted a hybrid human-AI approach to balance efficiency and quality.
+In constructing the reference answers for the FinLBench evaluation dataset, we employed a "2+1+1" workflow to ensure high-quality and reliable answers. For closed-ended questions, where clear answers exist within the document, we directly used the relevant content from the original text as the reference answer. For open-ended questions, which constitute 80% of the dataset and often involve financial documents spanning tens of thousands of words, we adopted a hybrid human-AI approach to balance efficiency and quality.
 
 Specifically, we began by leveraging two state-of-the-art LLMs, ChatGPT 4 and Claude 2, to independently generate two initial answers based on the question and the original financial document. Next, a human expert reviewed these AI-generated answers, validating them against the document content and integrating the best aspects of both into a cohesive and comprehensive response. Finally, a second human expert conducted a thorough review and optimization of the integrated answer, ensuring accuracy, clarity, and alignment with the original document. This finalized answer was used as the reference answer for the evaluation dataset.
 
@@ -666,7 +655,7 @@ The adoption of this workflow stems from the challenges inherent in creating a p
   <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/figure9.png" width="600px" height="300px" alt="Evaluation Process Illustration">
 </div>
 
-We present an example that includes the entire evaluation process, as depicted in Figure \[fig:wide4\]. Initially, we input the question and the original text into the LLMs that are to be evaluated, yielding the model's output. During the evaluation process, for commercial models, we submitted the entire PDF files directly to the LLMs. However, for locally deployed open-source models, we are unable to submit the PDF files directly. Instead, we extract the plain text from the PDFs and input that into the model. Subsequently, we input the generated content, the question, and the assessment prompts into the LLMs used for evaluation, which provides a set of generated scores and reasons. Finally, we integrate all the obtained content with the original text, perform a comparison, and make minor adjustments to the scores to arrive at the final score.
+We present an example that includes the entire evaluation process, as depicted in Figure. Initially, we input the question and the original text into the LLMs that are to be evaluated, yielding the model's output. During the evaluation process, for commercial models, we submitted the entire PDF files directly to the LLMs. However, for locally deployed open-source models, we are unable to submit the PDF files directly. Instead, we extract the plain text from the PDFs and input that into the model. Subsequently, we input the generated content, the question, and the assessment prompts into the LLMs used for evaluation, which provides a set of generated scores and reasons. Finally, we integrate all the obtained content with the original text, perform a comparison, and make minor adjustments to the scores to arrive at the final score.
 
 Upon receiving the initial score for this particular instance, we made adjustments due to several discrepancies. The relevance score, as provided by the scoring model, surpassed the designated range of 0 to 1 point, leading us to cap the relevance score at 1 point. The coherence score was justified with the comment, “it fails to explain the economic benefits and impact generated,” which did not correspond to our criteria for coherence. As a result, we revised the coherence score to 2 points. Fidelity, which reflects the model's adherence to the original text of the document, was initially scored without reference to the original text. After comparing the generated answer with the original text, we found that the original did indeed contain similar content. Consequently, we adjusted the fidelity score to 1 point.
 
@@ -711,17 +700,6 @@ This section presents a simplified version of the system prompt, which is used t
 | Consistency          | Compares the generated answer with the reference; key data must match exactly.           | 0–4         |
 | Faithfulness         | Assesses fidelity to the source document; identifies hallucinations.                     | 0–1         |
 
-### Evaluation Process
-
-Most tasks in our benchmark are open-ended, requiring a human–AI hybrid evaluation. For closed-ended questions, we use automatic metrics such as ROUGE to measure n-gram overlap between model outputs and references. However, open-ended questions often involve diverse, high-level semantics that automatic metrics cannot fully capture. Thus, we rely on human experts for final scoring:
-
-1. **Initial Machine Scoring**: GPT-4 scores each model-generated answer on the six dimensions.
-2. **Independent Expert Scoring**: Multiple human experts independently score each answer, referencing the machine scores.
-3. **Aggregation**: We aggregate these scores to produce the final evaluation.
-
-<div align="center">
-  <img src="https://github.com/valuesimplex/FinLongEval/blob/main/fig/%E8%AF%84%E4%BC%B0%E6%B5%81%E7%A8%8B%E7%A4%BA%E6%84%8F%E5%9B%BE.png" width="600px" height="300px" alt="Evaluation Workflow">
-</div>
 
 ## Evaluation Results
 
@@ -752,7 +730,19 @@ Key takeaways:
 ### Analysis by Document Type
 
 <div align="center">
-  <img src="https://github.com/valuesimplex/FinLongEval/blob/main/fig/%E8%AF%84%E6%B5%8B%E5%AF%B9%E8%B1%A1%E5%BE%97%E5%88%86-%E6%96%87%E6%A1%A3.png" width="650px" height="220px" alt="Score by Document Type">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/plot01.png" width="650px" height="220px" alt="Score by Question Type">
+</div>
+<div align="center">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/plot02.png" width="650px" height="220px" alt="Score by Question Type">
+</div>
+<div align="center">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/plot03.png" width="650px" height="220px" alt="Score by Question Type">
+</div>
+<div align="center">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/plot04.png" width="650px" height="220px" alt="Score by Question Type">
+</div>
+<div align="center">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/plot05.png" width="650px" height="220px" alt="Score by Question Type">
 </div>
 
 * For **major corporate actions** and **policy documents**, all tools perform comparably well, meeting business-usable standards, since these tasks focus on extraction and comprehension.
@@ -761,7 +751,16 @@ Key takeaways:
 ### Analysis by Question Type
 
 <div align="center">
-  <img src="https://github.com/valuesimplex/FinLongEval/blob/main/fig/%E8%AF%84%E6%B5%8B%E5%AF%B9%E8%B1%A1%E5%BE%97%E5%88%86-%E9%97%AE%E9%A2%98.png" width="650px" height="220px" alt="Score by Question Type">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/plot1.png width="650px" height="220px" alt="Score by Question Type">
+</div>
+<div align="center">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/plot2.png" width="650px" height="220px" alt="Score by Question Type">
+</div>
+<div align="center">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/plot3.png" width="650px" height="220px" alt="Score by Question Type">
+</div>
+<div align="center">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/plot4.png" width="650px" height="220px" alt="Score by Question Type">
 </div>
 
 * **Logical reasoning** and **event analysis** show the greatest tool gaps, driven by differences in core reasoning capabilities.
@@ -771,7 +770,7 @@ Key takeaways:
 ### Analysis of Calculation-Type Questions
 
 <div align="center">
-  <img src="https://github.com/valuesimplex/FinLongEval/blob/main/fig/%E6%95%B0%E6%8D%AE%E8%AE%A1%E7%AE%97.png" width="817px" height="457px" alt="Calculation Performance">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/figure6.png" width="817px" height="457px" alt="Calculation Performance">
 </div>
 
 Except for ChatGPT4, other tools perform poorly on numeric computations. Claude2 and some domestic tools execute the calculation steps correctly but err in final results. We recommend integrating external computation engines (e.g., Code Interpreter) for high-precision financial calculations, with LLMs orchestrating the workflow.
