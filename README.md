@@ -1,7 +1,4 @@
-# FinLongEval：面向金融场景的长文档评测集
-<div align="center">
-  <img src="https://github.com/valuesimplex/FinLongEval/blob/main/fig/logo.png" width="500px" height="120px">
-</div>
+# FinLBench：面向金融长文档场景的大型语言模型评测基准与数据集
 
 本项目由**北邮金融大数据安全实验室**和**熵简科技 AI Lab** 共同发起，从项目筹备、评测集构建、工具评测到评测报告撰写共历时近5个月时间。本次工作为阶段性成果输出，也欢迎其他有兴趣参与本项目的个人或组织加入，为评测集的持续完善贡献力量，我们将在文末持续更新主要贡献者和贡献单位。
 ### 为什么需要金融长文档评测集 ###
@@ -21,11 +18,7 @@ FinLongEval 评测集对于以下三类群体或组织有一定帮助：
 不同于其他评测报告中直接以大模型作为评测对象，本次我们将长文档阅读和推理的产品作为评估对象，因此整个评估结果既包含了大模型本身的长文档推理和理解能力，也同时包含了处理链上的其他环节的性能，如检索准确度、文档解析和分割效果等（若产品采用 RAG 的路线）。
 
 采用这一方案的原因在于，我们希望站在金融从业者（最终用户）的角度，全面评估当前大模型商业产品对于金融长文档处理能力的边界和不足，以及距离业务成熟可用的距离。
-### 工作计划 ###
-FinLongEval 评测集的整体工作计划如下：
-- [x] **2023-12**：发布 FinLongEval 1.0 版，包含中文场景下的金融长文档评测集；
-- [ ] **2024-02**：发布 FinLongEval 1.1 版，增加英文场景下的金融长文档评测集；
-- [ ] **2024-04**：根据社区反馈，在评测集规模、问题类型覆盖度、问题难度、文件类型覆盖上进行一次较大升级 ；
+
 ## 评测集详情介绍 ##
 ### 构建原则 ###
 在 FinLongEval 构建过程中，我们希望评测集能够从一线金融业务场景来，再服务到各个业务场景中去，能够真正代表金融场景下的各类典型问题和典型需求。为此，我们和多家一线证券公司的业务部门和IT部门进行深入沟通，最终整理和搜集了最具代表性的 **8 大类金融长文档**和 **12 大类问题**，共计 **43 篇金融长文档**和 **347 道问题**（FinLongEval 1.0版）。 
@@ -312,6 +305,44 @@ Below is a preview of our dataset structure—showing primary and secondary docu
 | Research Report | Equity Research Report         | The Electric Vehicle King Competes Globally, Building Core Competitiveness Through Vertical Integration | Trap Question         | BYD’s main business is fuel vehicles. Describe BYD’s fuel vehicle business status.                                                                                                                                                                                                         | “As of March 2022, BYD had begun to discontinue sales of fuel vehicles and shifted its focus entirely to the development and sale of new energy vehicles. Therefore, there is no further detailed information on BYD’s fuel vehicle business in the report, as the company has fully transitioned to new energy vehicles.”                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 
 </details>
+
+## An Evaluation Instance
+
+<div align="center">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/figure9.png" width="600px" height="300px" alt="Evaluation Process Illustration">
+</div>
+
+We present an example that includes the entire evaluation process, as depicted in Figure \[fig:wide4\]. Initially, we input the question and the original text into the LLMs that are to be evaluated, yielding the model's output. During the evaluation process, for commercial models, we submitted the entire PDF files directly to the LLMs. However, for locally deployed open-source models, we are unable to submit the PDF files directly. Instead, we extract the plain text from the PDFs and input that into the model. Subsequently, we input the generated content, the question, and the assessment prompts into the LLMs used for evaluation, which provides a set of generated scores and reasons. Finally, we integrate all the obtained content with the original text, perform a comparison, and make minor adjustments to the scores to arrive at the final score.
+
+Upon receiving the initial score for this particular instance, we made adjustments due to several discrepancies. The relevance score, as provided by the scoring model, surpassed the designated range of 0 to 1 point, leading us to cap the relevance score at 1 point. The coherence score was justified with the comment, “it fails to explain the economic benefits and impact generated,” which did not correspond to our criteria for coherence. As a result, we revised the coherence score to 2 points. Fidelity, which reflects the model's adherence to the original text of the document, was initially scored without reference to the original text. After comparing the generated answer with the original text, we found that the original did indeed contain similar content. Consequently, we adjusted the fidelity score to 1 point.
+
+## Six-dimensional Evaluation System
+
+- **Relevance (1 point):** The relationship between the generated answer text and the question. Ensuring relevance guarantees that the model provides answers directly related to the financial question, crucial for accurate decision-making.  
+  **Expert opinion:** Relevance is the fundamental criterion for evaluation, thus a binary evaluation metric is established for this dimension. The content must first be highly pertinent to the subject before other dimensions can be assessed.
+
+- **Fluency (2 points):** Whether the generated answer text is fluent, with a clear main idea and reasonable grammar. Fluency ensures that the generated financial text is clear and grammatically correct, facilitating ease of understanding.  
+  **Expert opinion:** Fluency directly impacts the reader's experience and comprehension. While fluency is important, in the financial domain, the accuracy and utility of the content are more critical. Therefore, fluency is assigned a moderate weight to balance linguistic expression with the quality of information.
+
+- **Coherence (2 points):** Evaluate whether the answer text itself is in line with common sense and logical, and whether the text paragraphs are organized reasonably. Coherence is vital for maintaining logical and organized reasoning in complex financial analyses and reports.  
+  **Expert opinion:** Coherence ensures clarity in the logic and structure of content. While important, in the financial domain, its significance is still lower than that of practicality and consistency, as the latter more directly impact decision-making quality.
+
+- **Helpfulness (5 points):** Whether the generated answer text meets the user’s request and provides necessary information (with a focus on whether there are clear conclusions and whether detailed data support is provided). Helpfulness assesses whether the model offers valuable insights and detailed data that aid in financial decision-making.  
+  **Expert opinion:** Usefulness directly reflects the practical value and applicability of the content. As this is the core objective of the evaluation, it is assigned the highest weight.
+
+- **Consistency (4 points):** Whether the answer text correctly answers the question. Consistency ensures that all generated data and conclusions align logically, preventing conflicting financial insights.  
+  **Expert opinion:** Consistency is a critical factor in ensuring the credibility of content. Information in the financial sector demands high levels of accuracy and consistency, thus it is given significant weight in evaluations.
+
+- **Fidelity (1 point):** Whether the generated answer text is faithful to the original text. Fidelity ensures the model’s output accurately reflects the original financial data, preserving accuracy and reliability.  
+  **Expert opinion:** Fidelity is a fundamental requirement for ensuring the accuracy of content. In the financial sector, while the importance of fidelity cannot be overlooked.
+
+## Prompt Settings
+
+### System Prompt
+
+This section presents a simplified version of the system prompt, which is used to guide the model in generating responses and scoring them based on six evaluation criteria. The complete version of the system prompt can be found in the attached document.
+
+
 
 ## Evaluation Methods for Financial Long-Document Processing Ability
 
