@@ -62,7 +62,7 @@ FinLongEval 评测集对于以下三类群体或组织有一定帮助：
 
 ### 文件的长度分布 ###
 <div align="center">
-  <img src="https://github.com/valuesimplex/FinLongEval/blob/main/fig/%E6%96%87%E6%A1%A3%E9%95%BF%E5%BA%A6%E5%88%86%E5%B8%83%E5%9B%BE.png" width="500px" height="280px">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/figure1.png" width="500px" height="280px">
 </div>
 
 上图所示为本次评测集中各个文件字数分布比例，可以看出，**超过80%以上的文件字数超过了1万字**，这一长度远远大于现有金融评测集的平均文本长度。超过 40% 以上的文件字数超过了2.5万字，这一长度超过了当下典型商用大模型的上下文窗口长度。此外，本评测集还包含了最长字数超过 **50万字**（约500页）的超长金融文档。
@@ -411,7 +411,7 @@ We collected and organized documents into 8 top-level categories and 18 subcateg
 * **Academic Papers**: Covers monetary policy, foreign reserves, pandemic research, etc.; 10,000–30,000 characters.
 
 <div align="center">
-  <img src="https://github.com/valuesimplex/FinLongEval/blob/main/fig/%E6%96%87%E4%BB%B6%E7%B1%BB%E5%9E%8B%E5%88%86%E5%B8%83%E5%9B%BE%E9%A5%BC%E5%9B%BE.png" width="750px" height="500px" alt="Document Type Distribution">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/figure3_00.png" width="750px" height="500px" alt="Document Type Distribution">
 </div>
 
 The figure above shows the distribution of document types in our benchmark. Broker research reports, issuer announcements/prospectuses (including regular reports, issuance documents, and major corporate actions), financial news, and conference transcripts account for 25.4%, 19.3%, 17.9%, and 15.6% respectively—closely mirroring real-world processing needs.
@@ -436,7 +436,7 @@ To comprehensively assess LLM capabilities on long financial texts across resear
 | Calculation Questions  | Perform mathematical computations; tests numeric reasoning.                     | Analysts may request derived metrics, such as computing financial ratios from reported data.      |
 
 <div align="center">
-  <img src="https://github.com/valuesimplex/FinLongEval/blob/main/fig/%E9%97%AE%E9%A2%98%E7%B1%BB%E5%9E%8B%E5%88%86%E5%B8%83%E5%9B%BE.png" width="450px" height="350px" alt="Question Type Distribution">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/figure4_00.png" width="450px" height="350px" alt="Question Type Distribution">
 </div>
 
 The above chart shows that reading comprehension, information extraction, and logical reasoning dominate (26%, 25%, 13%), while table extraction, event analysis, summarization, and trap questions each account for about 7%—reflecting our initial industry survey.
@@ -444,7 +444,7 @@ The above chart shows that reading comprehension, information extraction, and lo
 ### Distribution of Document Lengths
 
 <div align="center">
-  <img src="https://github.com/valuesimplex/FinLongEval/blob/main/fig/%E6%96%87%E6%A1%A3%E9%95%BF%E5%BA%A6%E5%88%86%E5%B8%83%E5%9B%BE.png" width="500px" height="280px" alt="Document Length Distribution">
+  <img src="https://github.com/Invariant0502/FinLBench/blob/main/figure/figure1.png" width="500px" height="280px" alt="Document Length Distribution">
 </div>
 
 Over 80% of documents exceed 10,000 characters, far surpassing typical financial benchmarks. Over 40% exceed 25,000 characters—longer than the context window of most commercial LLMs. We even include documents exceeding 500,000 characters (approximately 500 pages). These figures underscore that real financial files often span tens or hundreds of thousands of characters, making long-document capabilities indispensable for LLM adoption in finance.
